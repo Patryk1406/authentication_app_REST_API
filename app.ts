@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import { userRouter } from './routes/user.route.js';
 import { errorHandler } from './utils/errors.js';
 
-const app = express(); git;
+const app = express();
 
 app.use(helmet());
 app.use(express.json());
