@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import { hash, compare } from 'bcrypt';
-import * as jsonwebtoken from 'jsonwebtoken';
+import jsonwebtoken from 'jsonwebtoken';
 import { UserRecord } from '../records/user.record.js';
 import { NoUSerError, ValidationError } from '../utils/errors.js';
 import { UserEntity, JWTData } from '../types';
