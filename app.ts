@@ -16,6 +16,6 @@ app.use('/user', userRouter);
 
 app.use(errorHandler);
 
-app.listen(Number(process.env.PORT) || 3001, '127.0.0.1', () => {
-  console.log('The server is listening on http://localhost:3001');
+app.listen(Number(process.env.PORT) || 3001, '0.0.0.0', () => {
+  console.log('Severs is running!');
 });
