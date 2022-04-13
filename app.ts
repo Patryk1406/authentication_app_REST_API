@@ -1,8 +1,8 @@
 import * as express from 'express';
 import * as cors from 'cors';
 import helmet from 'helmet';
-import { errorHandler } from './utils/errors';
 import { userRouter } from './routes/user.route';
+import { errorHandler } from './utils/errors';
 
 const app = express();
 
