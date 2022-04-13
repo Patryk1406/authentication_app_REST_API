@@ -54,7 +54,7 @@ export class UserRecord {
   }
 
   static async getAll() {
-    const users = (await pool.execute('SELECT * FROM `users`') as [UserEntity[], FieldPacket[]])[0].map((user) => new UserRecord({
+    const users = (await pool.execute('SELECT `id`, `name`, `email`, `registrationAt`, `isBlocked`, `registrationAt`, `lastLoginAt` FROM `users`') as [UserEntity[], FieldPacket[]])[0].map((user) => new UserRecord({
       ...user,
       isBlocked: Boolean(user.isBlocked),
     }));
