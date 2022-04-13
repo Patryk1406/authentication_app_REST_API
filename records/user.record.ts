@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { FieldPacket } from 'mysql2';
-import { UserEntity } from '../types/user.entity';
-import { pool } from '../db/db';
+import { UserEntity } from '../types/user.entity.js';
+import { pool } from '../db/db.js';
 
 export class UserRecord {
   private readonly _id: string;

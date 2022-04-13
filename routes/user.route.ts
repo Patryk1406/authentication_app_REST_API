@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import { hash, compare } from 'bcrypt';
-import { sign, verify } from 'jsonwebtoken';
-import { UserRecord } from '../records/user.record';
-import { NoUSerError, ValidationError } from '../utils/errors';
-import { UserEntity } from '../types/user.entity';
-import { JWTData } from '../types';
+import * as jsonwebtoken from 'jsonwebtoken';
+import { UserRecord } from '../records/user.record.js';
+import { NoUSerError, ValidationError } from '../utils/errors.js';
+import { UserEntity, JWTData } from '../types';
 
 export const userRouter = Router();
 
@@ -14,7 +13,7 @@ userRouter.get('/', async (req, res, next) => {
   try {
     if (autHeader) {
       const token = req.get('Authorization').split(' ')[1];
-      const decodedToken = verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
+      const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
       const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).email);
       if (loadedUser.isBlocked) {
         res.status(308).json({ redirect: true });
@@ -81,7 +80,7 @@ userRouter.post('/login', async (req, res, next) => {
       res.status(308).json({ redirect: true });
       return;
     }
-    const token = sign(
+    const token = jsonwebtoken.sign(
       { email: loadedUser.email, userId: loadedUser.id },
       'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X',
       { expiresIn: '1h' },
@@ -99,7 +98,7 @@ userRouter.patch('', async (req, res, next) => {
   try {
     if (autHeader) {
       const token = req.get('Authorization').split(' ')[1];
-      const decodedToken = verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
+      const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
       const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).email);
       if (loadedUser.isBlocked) {
         res.status(308).json({ redirect: true });
@@ -120,7 +119,7 @@ userRouter.delete('', async (req, res, next) => {
   try {
     if (autHeader) {
       const token = req.get('Authorization').split(' ')[1];
-      const decodedToken = verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
+      const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
       const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).email);
       if (loadedUser.isBlocked) {
         res.status(308).json({ redirect: true });

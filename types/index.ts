@@ -1,2 +1,2 @@
-export * from './user.entity';
-export * from './JWTData';
+export * from './user.entity.js';
+export * from './JWTData.js';
