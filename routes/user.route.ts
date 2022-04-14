@@ -4,7 +4,7 @@ import { hash, compare } from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
 import { UserRecord } from '../records/user.record.js';
 import { NoUSerError, ValidationError } from '../utils/errors.js';
-import { UserEntity, JWTData } from '../types';
+import { JWTData } from '../types';
 
 export const userRouter = Router();
 
