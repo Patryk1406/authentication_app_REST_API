@@ -14,7 +14,7 @@ userRouter.get('/', async (req, res, next) => {
     if (autHeader) {
       const token = req.get('Authorization').split(' ')[1];
       const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
-      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).email);
+      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).userEmail);
       if (loadedUser.isBlocked) {
         res.status(308).json({ redirect: true });
         return;
@@ -87,7 +87,7 @@ userRouter.post('/login', async (req, res, next) => {
     );
     loadedUser.lastLoginAt = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
     await loadedUser.update();
-    res.status(200).json({ token, userId: loadedUser.id });
+    res.status(200).json({ token, userId: loadedUser.id, userEmail: loadedUser.email });
   } catch (e) {
     next(e);
   }
@@ -99,7 +99,7 @@ userRouter.patch('', async (req, res, next) => {
     if (autHeader) {
       const token = req.get('Authorization').split(' ')[1];
       const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
-      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).email);
+      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).userEmail);
       if (loadedUser.isBlocked) {
         res.status(308).json({ redirect: true });
         return;
@@ -120,7 +120,7 @@ userRouter.delete('', async (req, res, next) => {
     if (autHeader) {
       const token = req.get('Authorization').split(' ')[1];
       const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
-      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).email);
+      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).userEmail);
       if (loadedUser.isBlocked) {
         res.status(308).json({ redirect: true });
         return;

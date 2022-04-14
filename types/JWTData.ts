@@ -1,4 +1,4 @@
 export interface JWTData {
-  email: string,
+  userEmail: string,
   userId: string,
 }
