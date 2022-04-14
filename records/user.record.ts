@@ -52,6 +52,10 @@ export class UserRecord {
     this._lastLoginAt = value;
   }
 
+  get registrationAt(): string {
+    return this._registrationAt;
+  }
+
   get isBlocked(): boolean {
     return this._isBlocked;
   }
@@ -75,11 +79,13 @@ export class UserRecord {
   }
 
   async save() {
-    await pool.execute('INSERT INTO `users` (`id`, `email`, `name`, `password`) VALUES(:id, :email, :name, :password)', {
+    await pool.execute('INSERT INTO `users` (`id`, `email`, `name`, `password`, `lastLoginAt`, `registrationAt`) VALUES(:id, :email, :name, :password, :lastLoginAt, :registrationAt)', {
       id: this.id,
       email: this.email,
       name: this.name,
       password: this.password,
+      lastLoginAt: this.lastLoginAt,
+      registrationAt: this.registrationAt,
     });
   }
 

@@ -54,9 +54,13 @@ userRouter.post(
       if (!result.isEmpty()) {
         throw new ValidationError(result.array()[0].msg);
       }
-      const { name, email, password } = req.body as UserEntity;
+      const {
+        name, email, password, time,
+      } = req.body;
       const hashedPassword = await hash(password, 12);
-      const newUser = new UserRecord({ name, email, password: hashedPassword });
+      const newUser = new UserRecord({
+        name, email, password: hashedPassword, registrationAt: time, lastLoginAt: time,
+      });
       await newUser.save();
       res.status(201).json({ ok: true });
     } catch (e) {
@@ -85,7 +89,7 @@ userRouter.post('/login', async (req, res, next) => {
       'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X',
       { expiresIn: '1h' },
     );
-    loadedUser.lastLoginAt = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
+    loadedUser.lastLoginAt = req.body.time;
     await loadedUser.update();
     res.status(200).json({ token, userEmail: loadedUser.email });
   } catch (e) {
