@@ -81,13 +81,13 @@ userRouter.post('/login', async (req, res, next) => {
       return;
     }
     const token = jsonwebtoken.sign(
-      { email: loadedUser.email, userId: loadedUser.id },
+      { userEmail: loadedUser.email },
       'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X',
       { expiresIn: '1h' },
     );
     loadedUser.lastLoginAt = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
     await loadedUser.update();
-    res.status(200).json({ token, userId: loadedUser.id, userEmail: loadedUser.email });
+    res.status(200).json({ token, userEmail: loadedUser.email });
   } catch (e) {
     next(e);
   }

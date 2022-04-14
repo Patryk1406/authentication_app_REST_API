@@ -12,9 +12,11 @@ export class UserRecord {
 
   private readonly _name: string;
 
+  private readonly registrationAt?: string;
+
   private _lastLoginAt?: string;
 
-  private _isBlocked?: boolean;
+  private readonly _isBlocked?: boolean;
 
   constructor(user: UserEntity) {
     this._id = user.id ?? uuid();
@@ -22,6 +24,7 @@ export class UserRecord {
     this._email = user.email;
     this._password = user.password;
     this._lastLoginAt = user.lastLoginAt;
+    this._registrationAt = user.registrationAt;
     this._isBlocked = user.isBlocked;
   }
 
@@ -54,7 +57,7 @@ export class UserRecord {
   }
 
   static async getAll() {
-    const users = (await pool.execute('SELECT `id`, `name`, `email`, `registrationAt`, `isBlocked`, `registrationAt`, `lastLoginAt` FROM `users`') as [UserEntity[], FieldPacket[]])[0].map((user) => new UserRecord({
+    const users = (await pool.execute('SELECT `id`, `name`, `email`, `isBlocked`, `lastLoginAt`, `registrationAt` FROM `users`') as [UserEntity[], FieldPacket[]])[0].map((user) => new UserRecord({
       ...user,
       isBlocked: Boolean(user.isBlocked),
     }));

@@ -4,5 +4,6 @@ export interface UserEntity {
   password?: string;
   name: string;
   lastLoginAt?: string;
+  registrationAt?: string
   isBlocked?: boolean;
 }
