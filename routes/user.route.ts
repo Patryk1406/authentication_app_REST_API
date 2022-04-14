@@ -93,7 +93,7 @@ userRouter.post('/login', async (req, res, next) => {
   }
 });
 
-userRouter.patch('', async (req, res, next) => {
+userRouter.patch('/', async (req, res, next) => {
   const autHeader = req.get('Authorization');
   try {
     if (autHeader) {
@@ -104,8 +104,10 @@ userRouter.patch('', async (req, res, next) => {
         res.status(308).json({ redirect: true });
         return;
       }
-      await UserRecord.block(req.body.ids);
-      res.json({ ok: true });
+      const ok = req.body.block
+        ? await UserRecord.block(req.body.ids)
+        : await UserRecord.unblock(req.body.ids);
+      res.json({ ok });
     } else {
       res.status(401).end();
     }
@@ -114,7 +116,7 @@ userRouter.patch('', async (req, res, next) => {
   }
 });
 
-userRouter.delete('', async (req, res, next) => {
+userRouter.delete('/', async (req, res, next) => {
   const autHeader = req.get('Authorization');
   try {
     if (autHeader) {

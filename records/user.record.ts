@@ -99,6 +99,19 @@ export class UserRecord {
       }));
     }
     await Promise.all(promises);
+    return true;
+  }
+
+  static async unblock(ids: string[]) {
+    const promises = [];
+    for (let i = 0; i < ids.length; i += 1) {
+      const id = ids[i];
+      promises.push(pool.execute('UPDATE `users` SET `isBlocked` = 0 WHERE `id` = :id', {
+        id,
+      }));
+    }
+    await Promise.all(promises);
+    return true;
   }
 
   static async delete(ids: string[]) {
