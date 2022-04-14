@@ -12,7 +12,7 @@ export class UserRecord {
 
   private readonly _name: string;
 
-  private readonly registrationAt?: string;
+  private readonly _registrationAt?: string;
 
   private _lastLoginAt?: string;
 
