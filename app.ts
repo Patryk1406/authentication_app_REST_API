@@ -9,13 +9,13 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 app.use(cors({
-  origin: process.env.FRONTEND_HOST,
+  origin: process.env.FRONTEND_HOST || 'http://localhost:3000',
 }));
 
 app.use('/user', userRouter);
 
 app.use(errorHandler);
 
-app.listen(Number(process.env.PORT) || 3001, '0.0.0.0', () => {
+app.listen(Number(process.env.PORT) || 3001, 'localhost', () => {
   console.log('Severs is running!');
 });

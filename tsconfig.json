@@ -12,6 +12,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "module": "ES6"
   }
 }

@@ -15,7 +15,7 @@ userRouter.get('/', async (req, res, next) => {
       const token = req.get('Authorization').split(' ')[1];
       const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
       const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).userEmail);
-      if (loadedUser.isBlocked) {
+      if (!loadedUser || loadedUser.isBlocked) {
         res.status(308).json({ redirect: true });
         return;
       }
