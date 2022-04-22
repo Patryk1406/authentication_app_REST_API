@@ -16,6 +16,6 @@ app.use('/user', userRouter);
 
 app.use(errorHandler);
 
-app.listen(Number(process.env.PORT) || 3001, 'localhost', () => {
+app.listen(Number(process.env.PORT) || 3001, '0.0.0.0', () => {
   console.log('Severs is running!');
 });
