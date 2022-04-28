@@ -1,141 +1,75 @@
 import { Router } from 'express';
-import { body, validationResult } from 'express-validator';
-import { hash, compare } from 'bcrypt';
+import { body, header } from 'express-validator';
 import jsonwebtoken from 'jsonwebtoken';
 import { UserRecord } from '../records/user.record.js';
-import { NoUSerError, ValidationError } from '../utils/errors.js';
 import { JWTData } from '../types';
+import { signupController } from '../controllers/signup.controller.js';
+import { checkEmailInDatabase } from '../utils/validation/checkEmailInDatabase.js';
+import { validatePassword } from '../utils/validation/validatePassword.js';
+import { loginController } from '../controllers/login.controller.js';
+import { checkValidationMiddleware } from '../middlewares/checkValidation.middleware.js';
+import { checkIffUserExists } from '../utils/validation/checkIffUserExists.js';
+import { getAllUsersController } from '../controllers/getAllUsers.controller.js';
 
 export const userRouter = Router();
 
-userRouter.get('/', async (req, res, next) => {
-  const autHeader = req.get('Authorization');
-  try {
-    if (autHeader) {
-      const token = req.get('Authorization').split(' ')[1];
-      const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
-      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).userEmail);
-      if (!loadedUser || loadedUser.isBlocked) {
-        res.status(308).json({ redirect: true });
-        return;
-      }
-      const users = await UserRecord.getAll();
-      res.json({ users });
-    } else {
-      res.status(401).end();
-    }
-  } catch (e) {
-    next(e);
-  }
-});
+userRouter.get(
+  '/',
+  header('Authorization').custom(checkIffUserExists),
+  checkValidationMiddleware,
+  getAllUsersController,
+);
 
 userRouter.post(
   '/signup',
-  body('email')
-    .isEmail()
-    .withMessage('Please enter a valid email.')
-    .custom(async (value) => {
-      const user: UserRecord | null = await UserRecord.getByEmail(value);
-      if (user) {
-        throw new Error('E-mail already in use');
-      }
-      return true;
-    })
-    .normalizeEmail(),
-  body('name')
-    .isLength({ min: 1, max: 50 })
-    .withMessage('Your name cannot be an empty string and cannot have more than 50 chars.'),
-  body('password')
-    .isLength({ min: 1, max: 50 })
-    .withMessage('Your password cannot be an empty string and cannot have more than 50 chars.'),
-  async (req, res, next) => {
-    try {
-      const result = validationResult(req);
-      if (!result.isEmpty()) {
-        throw new ValidationError(result.array()[0].msg);
-      }
-      const {
-        name, email, password, time,
-      } = req.body;
-      const hashedPassword = await hash(password, 12);
-      const newUser = new UserRecord({
-        name, email, password: hashedPassword, registrationAt: time, lastLoginAt: time,
-      });
-      await newUser.save();
-      res.status(201).json({ ok: true });
-    } catch (e) {
-      next(e);
-    }
-  },
+  body('email').isEmail().bail().custom(checkEmailInDatabase).normalizeEmail(),
+  body('name', 'Invalid user\'s name').isLength({ min: 2, max: 60 }).matches(/^\p{L}+$/u).escape().trim(),
+  body('password').custom(validatePassword),
+  signupController,
 );
 
-userRouter.post('/login', async (req, res, next) => {
+userRouter.post(
+  '/login',
+  body('email').exists().bail().custom(checkIffUserExists),
+  body('password').exists(),
+  checkValidationMiddleware,
+  loginController,
+);
+
+// userRouter.patch('/', async (req, res, next) => {
+//   const autHeader = req.get('Authorization');
+//   try {
+//     if (autHeader) {
+//       const token = req.get('Authorization').split(' ')[1];
+//       const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
+//       const loadedUser = await UserRecord.getOneByEmail((decodedToken as JWTData).userEmail);
+//       if (loadedUser.isBlocked) {
+//         res.status(308).json({ redirect: true });
+//         return;
+//       }
+//       const ok = req.body.block
+//         ? await UserRecord.block(req.body.ids)
+//         : await UserRecord.unblock(req.body.ids);
+//       res.json({ ok });
+//     } else {
+//       res.status(401).end();
+//     }
+//   } catch (e) {
+//     next(e);
+//   }
+// });
+
+userRouter.delete('/', async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const loadedUser = await UserRecord.getByEmail(email);
-    if (!loadedUser) {
-      throw new NoUSerError('A user with the given email cannot be found in our database.');
-    }
-    const isEqual = await compare(password, loadedUser.password);
-    if (!isEqual) {
-      throw new ValidationError('The password is incorrect');
-    }
+    const token = req.get('Authorization').split(' ')[1];
+    const { userEmail } = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X') as JWTData;
+    const loadedUser = await UserRecord.getOneByEmail(userEmail);
     if (loadedUser.isBlocked) {
       res.status(308).json({ redirect: true });
       return;
     }
-    const token = jsonwebtoken.sign(
-      { userEmail: loadedUser.email },
-      'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X',
-      { expiresIn: '1h' },
-    );
-    loadedUser.lastLoginAt = req.body.time;
-    await loadedUser.update();
-    res.status(200).json({ token, userEmail: loadedUser.email });
-  } catch (e) {
-    next(e);
-  }
-});
-
-userRouter.patch('/', async (req, res, next) => {
-  const autHeader = req.get('Authorization');
-  try {
-    if (autHeader) {
-      const token = req.get('Authorization').split(' ')[1];
-      const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
-      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).userEmail);
-      if (loadedUser.isBlocked) {
-        res.status(308).json({ redirect: true });
-        return;
-      }
-      const ok = req.body.block
-        ? await UserRecord.block(req.body.ids)
-        : await UserRecord.unblock(req.body.ids);
-      res.json({ ok });
-    } else {
-      res.status(401).end();
-    }
-  } catch (e) {
-    next(e);
-  }
-});
-
-userRouter.delete('/', async (req, res, next) => {
-  const autHeader = req.get('Authorization');
-  try {
-    if (autHeader) {
-      const token = req.get('Authorization').split(' ')[1];
-      const decodedToken = jsonwebtoken.verify(token, 'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X');
-      const loadedUser = await UserRecord.getByEmail((decodedToken as JWTData).userEmail);
-      if (loadedUser.isBlocked) {
-        res.status(308).json({ redirect: true });
-        return;
-      }
-      await UserRecord.delete(req.body.ids);
-      res.json({ ok: true });
-    } else {
-      res.status(401).end();
-    }
+    await UserRecord.delete(req.body.ids);
+    res.json({ ok: true });
   } catch (e) {
     next(e);
   }

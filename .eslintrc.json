@@ -5,11 +5,11 @@
     },
     "extends": [
         "airbnb-base",
-        "airbnb-typescript"
+        "airbnb-typescript/base"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "project": "../tsconfig.json",
+        "project": "./tsconfig.json",
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
@@ -17,8 +17,8 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "react/jsx-filename-extension": "off",
         "import/prefer-default-export": "off",
-        "no-underscore-dangle": "off"
+        "no-underscore-dangle": "off",
+        "newline-per-chained-call": "off"
     }
 }

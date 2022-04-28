@@ -12,9 +12,9 @@ export class UserRecord {
 
   private readonly _name: string;
 
-  private readonly _registrationAt?: string;
+  private readonly _registrationAt?: Date;
 
-  private _lastLoginAt?: string;
+  private _lastLoginAt?: Date;
 
   private readonly _isBlocked?: boolean;
 
@@ -28,31 +28,31 @@ export class UserRecord {
     this._isBlocked = user.isBlocked;
   }
 
-  get email(): string {
+  get email() {
     return this._email;
   }
 
-  get id(): string {
+  get id() {
     return this._id;
   }
 
-  get password(): string {
+  get password() {
     return this._password;
   }
 
-  get name(): string {
+  get name() {
     return this._name;
   }
 
-  get lastLoginAt(): string {
+  get lastLoginAt() {
     return this._lastLoginAt;
   }
 
-  set lastLoginAt(value: string) {
+  set lastLoginAt(value: Date) {
     this._lastLoginAt = value;
   }
 
-  get registrationAt(): string {
+  get registrationAt() {
     return this._registrationAt;
   }
 
@@ -68,56 +68,39 @@ export class UserRecord {
     return users;
   }
 
-  static async getByEmail(email: string): Promise<UserRecord | null> {
+  static async getOneByEmail(email: string): Promise<UserRecord | null> {
     const [user] = (await pool.execute('SELECT * FROM `users` WHERE `email` = :email', {
       email,
-    }) as [UserEntity[], FieldPacket[]]);
-    return user[0] ? new UserRecord({
-      ...user[0],
-      isBlocked: Boolean(user[0].isBlocked),
-    }) : null;
+    }) as [UserEntity[], FieldPacket[]])[0];
+    return user ? new UserRecord({ ...user, isBlocked: Boolean(user.isBlocked) }) : null;
   }
 
   async save() {
-    await pool.execute('INSERT INTO `users` (`id`, `email`, `name`, `password`, `lastLoginAt`, `registrationAt`) VALUES(:id, :email, :name, :password, :lastLoginAt, :registrationAt)', {
-      id: this.id,
-      email: this.email,
-      name: this.name,
-      password: this.password,
-      lastLoginAt: this.lastLoginAt,
-      registrationAt: this.registrationAt,
+    await pool.execute('INSERT INTO `users` (`id`, `email`, `name`, `password`) VALUES(:id, :email, :name, :password)', {
+      id: this._id,
+      email: this._email,
+      name: this._name,
+      password: this._password,
     });
   }
 
   async update() {
     await pool.execute('UPDATE `users` SET `lastLoginAt` = :lastLoginAt WHERE `id` = :id', {
-      lastLoginAt: this.lastLoginAt,
-      id: this.id,
+      lastLoginAt: this._lastLoginAt,
+      id: this._id,
     });
   }
 
-  static async block(ids: string[]) {
+  static async updateStatus(ids: string[], block: boolean) {
     const promises = [];
     for (let i = 0; i < ids.length; i += 1) {
       const id = ids[i];
-      promises.push(pool.execute('UPDATE `users` SET `isBlocked` = 1 WHERE `id` = :id', {
+      promises.push(pool.execute('UPDATE `users` SET `isBlocked` = :block WHERE `id` = :id', {
         id,
+        block: Number(block),
       }));
     }
     await Promise.all(promises);
-    return true;
-  }
-
-  static async unblock(ids: string[]) {
-    const promises = [];
-    for (let i = 0; i < ids.length; i += 1) {
-      const id = ids[i];
-      promises.push(pool.execute('UPDATE `users` SET `isBlocked` = 0 WHERE `id` = :id', {
-        id,
-      }));
-    }
-    await Promise.all(promises);
-    return true;
   }
 
   static async delete(ids: string[]) {

@@ -39,6 +39,7 @@
     "helmet": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.3",
+    "password-validator": "^5.2.1",
     "uuid": "^8.3.2"
   }
 }
