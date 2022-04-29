@@ -4,10 +4,10 @@ import { JWTData } from '../types/index.js';
 import { UserRecord } from '../records/user.record.js';
 import { checkIfUserIsBlocked } from '../utils/validation/checkIfUserIsBlocked.js';
 
-export async function getAllUsersController(req: Request, res: Response, next: NextFunction) {
+export async function deleteUsersController(req: Request, res: Response, next: NextFunction) {
   try {
-    const users = await UserRecord.getAll();
-    res.json({ users });
+    await UserRecord.delete(req.body.ids);
+    res.json({ ok: true });
   } catch (e) {
     next(e);
   }
