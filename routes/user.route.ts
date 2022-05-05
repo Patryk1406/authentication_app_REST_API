@@ -21,7 +21,7 @@ userRouter.get(
 
 userRouter.post(
   '/signup',
-  body('email').isEmail().bail().custom(checkEmailInDatabase).normalizeEmail(),
+  body('email').isEmail().bail().normalizeEmail().custom(checkEmailInDatabase),
   body('name', 'Invalid user\'s name').isLength({ min: 2, max: 60 }).matches(/^\p{L}+$/u).escape().trim(),
   body('password').custom(validatePassword),
   checkValidationMiddleware,
