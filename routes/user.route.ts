@@ -24,12 +24,13 @@ userRouter.post(
   body('email').isEmail().bail().custom(checkEmailInDatabase).normalizeEmail(),
   body('name', 'Invalid user\'s name').isLength({ min: 2, max: 60 }).matches(/^\p{L}+$/u).escape().trim(),
   body('password').custom(validatePassword),
+  checkValidationMiddleware,
   signupController,
 );
 
 userRouter.post(
   '/login',
-  body('email').isEmail().bail().custom(checkIffUserExistsAndIsEligible),
+  body('email').isEmail().bail().custom(checkIffUserExistsAndIsEligible).normalizeEmail(),
   body('password').isString(),
   checkValidationMiddleware,
   loginController,
