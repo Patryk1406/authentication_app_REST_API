@@ -7,7 +7,8 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
+Runs the built app in the development mode. \
+Send requests to http://localhost:3001 to see how it works.
 
 ### `npm run build`
 
