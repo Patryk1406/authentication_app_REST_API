@@ -7,11 +7,7 @@ interface ReqBody {
 }
 
 export async function updateStatusController(req: Request, res: Response, next: NextFunction) {
-  try {
-    const { ids, block } = req.body as ReqBody;
-    await UserRecord.updateStatus(ids, JSON.parse(block));
-    res.json({ ok: true });
-  } catch (e) {
-    next(e);
-  }
+  const { ids, block } = req.body as ReqBody;
+  await UserRecord.updateStatus(ids, JSON.parse(block));
+  res.json({ ok: true });
 }
