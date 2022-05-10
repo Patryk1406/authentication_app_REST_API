@@ -21,5 +21,5 @@ export async function loginController(req: Request, res: Response, next: NextFun
   );
   loadedUser.lastLoginAt = new Date();
   await loadedUser.update();
-  res.status(200).json({ token, expiringTime: Date.now() + 3600 * 1000 });
+  res.status(200).json({ token, expirationTime: Date.now() + 3600 * 1000 });
 }
