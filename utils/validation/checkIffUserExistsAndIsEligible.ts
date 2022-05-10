@@ -21,6 +21,6 @@ export async function checkIffUserExistsAndIsEligible(value: string, { location 
       return Promise.reject(e);
     }
   } else user = await UserRecord.getOneByEmail(value);
-  if (!user) return Promise.reject(new InvalidCredentials('PLease enter a valid password and email address.'));
+  if (!user) return Promise.reject(new InvalidCredentials('Please enter a valid password and email address.'));
   return true;
 }
