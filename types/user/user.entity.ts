@@ -3,7 +3,7 @@ export interface UserEntity {
   email: string;
   password?: string;
   name: string;
-  lastLoginAt?: Date;
-  registrationAt?: Date;
+  lastLoginAt?: string;
+  registrationAt?: string;
   isBlocked?: boolean;
 }

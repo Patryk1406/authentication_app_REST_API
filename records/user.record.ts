@@ -23,8 +23,8 @@ export class UserRecord {
     this._name = user.name;
     this._email = user.email;
     this._password = user.password;
-    this._lastLoginAt = user.lastLoginAt;
-    this._registrationAt = user.registrationAt;
+    this._lastLoginAt = user.lastLoginAt ? new Date(user.lastLoginAt) : undefined;
+    this._registrationAt = user.registrationAt ? new Date(user.registrationAt) : undefined;
     this._isBlocked = user.isBlocked;
   }
 
@@ -48,8 +48,8 @@ export class UserRecord {
     return this._lastLoginAt;
   }
 
-  set lastLoginAt(value: Date) {
-    this._lastLoginAt = value;
+  set lastLoginAt(newDate: Date) {
+    this._lastLoginAt = newDate;
   }
 
   get registrationAt() {

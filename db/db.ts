@@ -10,8 +10,3 @@ export const pool = mysql.createPool({
   namedPlaceholders: true,
   dateStrings: false,
 });
-
-(async () => {
-  const date = new Date();
-  const [res] = await pool.execute('UPDATE `users` SET `lastLoginAt` = ? WHERE `id` = "143cdec0-c853-4341-9078-6529c3e54883"', [date]);
-})();

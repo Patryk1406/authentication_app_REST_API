@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { compare } from 'bcrypt';
 import { UserRecord } from '../records/user.record.js';
 import { InvalidCredentials } from '../utils/errors.js';
+import { checkIfUserIsBlocked } from '../utils/validation/checkIfUserIsBlocked.js';
 
 interface ReqBody {
   email: string;
@@ -14,6 +15,7 @@ export async function loginController(req: Request, res: Response, next: NextFun
   const loadedUser = await UserRecord.getOneByEmail(email);
   const isEqual = await compare(password, loadedUser.password);
   if (!isEqual) throw new InvalidCredentials('Please enter a valid password and email address.');
+  checkIfUserIsBlocked(loadedUser);
   const token = jsonwebtoken.sign(
     { userEmail: loadedUser.email },
     'ldzAxLmvinv5whm2kgDvPjf7C5m9ngeq1298jdPArNc7lcNyiXxavKXVWi7bD9X',

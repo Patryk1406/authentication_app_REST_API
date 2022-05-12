@@ -8,8 +8,8 @@ export async function getAllUsersController(req: Request, res: Response, next: N
     id: user.id,
     name: user.name,
     email: user.email,
-    lastLoginAt: user.lastLoginAt,
-    registrationAt: user.registrationAt,
+    lastLoginAt: user.lastLoginAt.toISOString(),
+    registrationAt: user.registrationAt.toISOString(),
     isBlocked: user.isBlocked,
   }));
   res.json({ users: normalizedUsers });
